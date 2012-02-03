@@ -10,6 +10,8 @@ version := "1.0"
 
 scalaVersion := "2.9.1"
 
+scalacOptions ++= Seq("-deprecation")
+
 libraryDependencies += "net.lag" % "configgy" % "2.0.0"
 
 libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.9.1"
@@ -22,6 +24,12 @@ libraryDependencies += "com.mongodb.casbah" %% "casbah" % "2.1.5-1"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.9.1" % "1.7.RC1"
 
+libraryDependencies += "com.twitter" % "util-core_2.9.1" % "1.12.12"
+
+libraryDependencies += "com.twitter" % "util-eval_2.9.1" % "1.12.12"
+
+libraryDependencies += "com.twitter" % "ostrich_2.9.1" % "4.10.4"
+
 // libraryDependencies += "com.h2database" % "h2" % "1.2.163"
 
 // libraryDependencies += "org.h2database" % "h2database" % "1.0.20061217"
@@ -29,5 +37,7 @@ libraryDependencies += "org.scalatest" % "scalatest_2.9.1" % "1.7.RC1"
 resolvers += "scala-tools-repo" at "http://scala-tools.org/repo-releases"
 
 resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
+
+resolvers += "twitter-repo" at "http://maven.twttr.com"
 
 test in assembly := {}
