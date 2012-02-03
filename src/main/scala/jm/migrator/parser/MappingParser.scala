@@ -3,7 +3,7 @@ package jm.migrator.parser
 import net.liftweb.json.JsonParser._
 import io.Source
 import java.io.{FileInputStream, File, InputStream}
-import net.liftweb.json._
+// import net.liftweb.json._
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import net.liftweb.json.DefaultFormats

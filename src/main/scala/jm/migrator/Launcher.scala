@@ -3,7 +3,7 @@ package jm.migrator
 import db.{MongoInsertBackend, MongoUtil}
 import migration.SQLImporter
 import parser.MappingParser
-import net.lag.configgy.Configgy
+import _root_.net.lag.configgy.Configgy
 import net.lag.logging.Logger
 
 
@@ -24,7 +24,7 @@ object Launcher {
     Configgy.configure("jmm.conf")
     log.debug("Using config: ")
     log.debug(config.toConfigString)
-    val filename = config.getString("mapping.file", "./data/mapping.json")
+    val filename = config.getString("mapping.file", "mapping.json")
     val collections = parser.parseFile(filename)
     log.debug("Collections: "+collections)
     log.debug(collections toString)
