@@ -1,3 +1,10 @@
 .history
 target
 project/target
+*.swp
+*~
+.cache
+.classpath
+.lib
+.project
+.settings

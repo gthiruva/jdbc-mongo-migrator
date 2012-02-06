@@ -1,19 +1,11 @@
 package jm.migrator.util
 
-import net.lag.configgy.Configgy
-
-/**
- * Authod: Yuri Buyanov
- * Date: 2/8/11 5:26 PM
- */
+import _root_.jm.migrator._
 
 object ShortUrlEncoder {
-  val config = Configgy.config
-  val alphabet = config.getString(
-                   "mapping.short_url.alphabet",
-                   "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXY01234567890")
-  val blockSize = config.getInt("mapping.short_url.blockSize", 12)
-  val minLength = config.getInt("mapping.short_url.minLength", 4)
+  val alphabet = Launcher.settings.mappingShortUrlAlphabet // "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXY01234567890")
+  val blockSize = Launcher.settings.mappingShortUrlBlockSize   //config.getInt("mapping.short_url.blockSize", 12)
+  val minLength = Launcher.settings.mappingShortUrlMinLength   // config.getInt("mapping.short_url.minLength", 4)
 
   val mask = (1 << blockSize) - 1
   val mapping = (0 until blockSize).reverse

@@ -12,6 +12,10 @@ scalaVersion := "2.9.1"
 
 scalacOptions ++= Seq("-deprecation")
 
+scalacOptions ++= Seq("-unchecked")
+
+libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.6.4"
+
 libraryDependencies += "net.lag" % "configgy" % "2.0.0"
 
 libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.9.1"
@@ -29,6 +33,9 @@ libraryDependencies += "com.twitter" % "util-core_2.9.1" % "1.12.12"
 libraryDependencies += "com.twitter" % "util-eval_2.9.1" % "1.12.12"
 
 libraryDependencies += "com.twitter" % "ostrich_2.9.1" % "4.10.4"
+
+libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.18"
+
 
 // libraryDependencies += "com.h2database" % "h2" % "1.2.163"
 

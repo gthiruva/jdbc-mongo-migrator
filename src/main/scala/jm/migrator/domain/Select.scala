@@ -2,12 +2,6 @@ package jm.migrator.domain
 
 import jm.migrator.util.Implicits._
 
-/**
- * Authod: Yuri Buyanov
- * Date: 2/3/11 1:29 PM
- */
-
-
 trait Select {
   def mapping: Selectable
   def from: String

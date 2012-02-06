@@ -1,43 +1,35 @@
 package jm.migrator.db
 
 import com.mongodb.casbah.Imports._
-
-import net.lag.logging.Logger
-import net.lag.configgy.Configgy
+import com.twitter.logging._
 import com.mongodb.casbah.Imports
-
-/**
- * Authod: Yuri Buyanov
- * Date: 2/4/11 2:36 PM
- */
+import _root_.jm.migrator._
 
 object MongoUtil {
-  val log = Logger get
-  val config = Configgy config
+  val log = Logger.get(getClass)
+  log.setLevel(Level.ALL)
+  log.addHandler(new ConsoleHandler(new Formatter(), None))
 
-  val dryRun = config.getBool("mongo.dry-run", true)
-
+  val dryRun = Launcher.settings.mongoDryRun
 
   val (connOpt, dbOpt) =
     if (dryRun) {
       log.warning("DRY RUN, NO ACTUAL DATA WRITTEN")
       (None, None)
     } else {
-      val conn = MongoConnection(
-        config.getString("mongo.host", "localhost"),
-        config.getInt("mongo.port", 27017))
+      val conn = MongoConnection(Launcher.settings.mongoHost, Launcher.settings.mongoPort)
       log.info("Connected to %s", conn.debugString)
 
-      val db = conn(config.getString("mongo.database", "default"))
+      val db = conn(Launcher.settings.mongoDatabase)
       log.info("Using DB %s", db)
 
-      val user = config.getString("mongo.user", "")
+      val user = "" //  config.getString("mongo.user", "")
       if (user.length > 0) {
         log.info("Authenticating as %s", user)
-        db.authenticate(user, config.getString("mongo.password", ""))
+        db.authenticate(user, "") // config.getString("mongo.password", ""))
       }
 
-      if (config.getBool("mongo.clean", true)) {
+      if (Launcher.settings.mongoClean) {
         log.info("mongo.clean = true, dropping DB before migration")
         db.dropDatabase
       }

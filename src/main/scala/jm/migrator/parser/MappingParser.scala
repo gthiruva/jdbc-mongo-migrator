@@ -10,9 +10,9 @@ import net.liftweb.json.DefaultFormats
 
 import jm.migrator.domain._
 
-import net.lag.logging.Logger
-
-
+import com.twitter.logging._
+//import com.twitter.logging.Logger
+//import com.twitter.logging.config._
 
 /**
  * Authod: Yuri Buyanov
@@ -20,8 +20,9 @@ import net.lag.logging.Logger
  */
 
 class MappingParser {
-  val log = Logger.get
-
+  val log = Logger.get(getClass)
+  log.setLevel(Level.DEBUG)
+  log.addHandler(new ConsoleHandler(new Formatter(), None))
 
   def parseFile(filename: String): Iterable[CollectionMapping] = {
     println("Parsing filename: "+filename)

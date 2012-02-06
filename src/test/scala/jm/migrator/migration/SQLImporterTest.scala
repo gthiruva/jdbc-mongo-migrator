@@ -12,8 +12,6 @@ import com.mongodb.DBObject
 import com.mongodb.casbah.Imports._
 import collection.mutable.ArrayBuffer
 
-;
-
 
 /*
  * Author: Yuri Buyanov

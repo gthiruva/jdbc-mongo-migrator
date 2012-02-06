@@ -2,24 +2,21 @@ package jm.migrator.migration
 
 import jm.migrator.db.DBUtil._
 
-import net.lag.logging.Logger
-import net.lag.configgy.Configgy
+import com.twitter.logging._
 import jm.migrator.domain._
 import collection.mutable.Buffer
 import com.mongodb.casbah.Imports._
 import jm.migrator.db.MongoUtil._
 import java.sql.{Statement, Connection, ResultSetMetaData, ResultSet}
 import jm.migrator.db.InsertBackend
-
-/**
- * Authod: Yuri Buyanov
- * Date: 2/4/11 11:52 AM
- */
+import _root_.jm.migrator._
 
 case class ColumnData(name: String, columnType: Int, fieldName: String)
 
 case object Meta {
-  val log = Logger get
+  val log = Logger.get(getClass)
+  log.setLevel(Level.ALL)
+  log.addHandler(new ConsoleHandler(new Formatter(), None))
 
   def apply(rs: ResultSet, collectionMapping: CollectionMapping): Iterator[ColumnData] = new Iterator[ColumnData] {
     val metaData = rs.getMetaData
@@ -45,15 +42,17 @@ case object Meta {
       )
     }
   }
-
 }
 
 
 abstract class SQLImporter(val mapping: Iterable[CollectionMapping]) extends InsertBackend {
-  val log = Logger get
-  val config = Configgy.config
-  val limit = config.getInt("jdbc.limit", 0)
+  val log = Logger.get(getClass)
+  log.setLevel(Level.ALL)
+  log.addHandler(new ConsoleHandler(new Formatter(), None))
+  val limit = Launcher.settings.jdbcLimit
   def fetch = {
+
+    log.debug("Importing from SQL DB")
 
     using(connection) { conn =>
       mapping map { collectionMapping =>
@@ -73,7 +72,7 @@ abstract class SQLImporter(val mapping: Iterable[CollectionMapping]) extends Ins
           offset += limit
           fetchedTotal += fetched
         } while (limit!=0 && fetched!=0)
-        log.info("%d entries imported to %s", fetchedTotal, collectionMapping.name)
+        log.debug("%d entries imported to %s", fetchedTotal, collectionMapping.name)
       }
     }
   }

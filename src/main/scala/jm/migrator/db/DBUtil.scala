@@ -1,28 +1,26 @@
 package jm.migrator.db
 
 import java.sql.{Connection, DriverManager, ResultSet}
-import net.lag.logging.Logger
-import net.lag.configgy.Configgy
-//import java.io.Closeable
-
-/**
- * Authod: Yuri Buyanov
- * Date: 2/4/11 11:42 AM
- */
+import com.twitter.ostrich.admin._
+import com.twitter.ostrich.admin.config._
+import com.twitter.logging._
+import _root_.jm.migrator._
 
 object DBUtil {
-  private val config = Configgy config
-  private val log = Logger get
+  private val sett = Launcher.settings;
+  private val log = Logger.get(getClass)
+  log.setLevel(Level.ALL)
+  log.addHandler(new ConsoleHandler(new Formatter(), None))
 
-  Class.forName(config getString ("jdbc.driver", "com.mysql.jdbc.Driver")).newInstance;
-  val connection = DriverManager getConnection (config getString ("jdbc.uri", "jdbc://localhost"))
+  Class.forName(sett.jdbcDriver).newInstance;
+  val connection = DriverManager getConnection (sett.jdbcUri)
 
+  log.debug("Using driver " + sett.jdbcDriver + " to reach " + sett.jdbcUri)
+  
   def using[Closeable <: {def close(): Unit}, B](closeable: Closeable)(getB: Closeable => B): B =
     try {
       getB(closeable)
     } finally {
       closeable.close()
     }
-
-
 }
