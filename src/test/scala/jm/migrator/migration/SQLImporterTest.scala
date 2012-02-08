@@ -1,15 +1,18 @@
 package jm.migrator.migration
 
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import jm.migrator.parser.MappingParser
 import java.sql.{DriverManager, Connection}
 import net.lag.configgy.Configgy
 import org.scalatest.matchers.MustMatchers
 import jm.migrator.db.DBUtil._
 import jm.migrator.db.InsertBackend
-import com.mongodb.DBObject
 
+import com.mongodb.casbah.Implicits._
 import com.mongodb.casbah.Imports._
+
+//import com.mongodb.DBObject
+//import com.mongodb.casbah.Imports._
 import collection.mutable.ArrayBuffer
 
 
@@ -34,7 +37,7 @@ trait TestInsertBackend extends InsertBackend {
   }
 }
 
-class SQLImporterTest extends Spec with MustMatchers {
+class SQLImporterTest extends FunSpec with MustMatchers {
   val config = getClass.getResource("/test_config.conf").getFile
   Configgy.configure(config)
 

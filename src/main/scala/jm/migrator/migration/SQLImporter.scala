@@ -5,7 +5,14 @@ import jm.migrator.db.DBUtil._
 import com.twitter.logging._
 import jm.migrator.domain._
 import collection.mutable.Buffer
-import com.mongodb.casbah.Imports._
+
+import com.mongodb.casbah._
+import com.mongodb.casbah.MongoConnection
+//import com.mongodb.casbah.WriteConcern
+import com.mongodb.casbah.commons.MongoDBObject
+//import com.mongodb.DBObject
+//import org.bson.types.ObjectId
+
 import jm.migrator.db.MongoUtil._
 import java.sql.{Statement, Connection, ResultSetMetaData, ResultSet}
 import jm.migrator.db.InsertBackend
@@ -15,7 +22,7 @@ case class ColumnData(name: String, columnType: Int, fieldName: String)
 
 case object Meta {
   val log = Logger.get(getClass)
-  log.setLevel(Level.ALL)
+  log.setLevel(Level.DEBUG)
   log.addHandler(new ConsoleHandler(new Formatter(), None))
 
   def apply(rs: ResultSet, collectionMapping: CollectionMapping): Iterator[ColumnData] = new Iterator[ColumnData] {
@@ -50,8 +57,8 @@ abstract class SQLImporter(val mapping: Iterable[CollectionMapping]) extends Ins
   log.setLevel(Level.ALL)
   log.addHandler(new ConsoleHandler(new Formatter(), None))
   val limit = Launcher.settings.jdbcLimit
-  def fetch = {
 
+  def fetch = {
     log.debug("Importing from SQL DB")
 
     using(connection) { conn =>
@@ -74,7 +81,9 @@ abstract class SQLImporter(val mapping: Iterable[CollectionMapping]) extends Ins
         } while (limit!=0 && fetched!=0)
         log.debug("%d entries imported to %s", fetchedTotal, collectionMapping.name)
       }
+      log.debug("End of mapping loop")
     }
+   log.debug("End of using loop")
   }
 
   def query(collectionMapping: CollectionMapping,
@@ -86,16 +95,21 @@ abstract class SQLImporter(val mapping: Iterable[CollectionMapping]) extends Ins
       case 0 => ""
       case lim => " LIMIT "+lim+" OFFSET "+offset
     })
-    log.info("SQL: "+pagedSQL)
+    log.info("Executing SQL Query: " + pagedSQL)
 
     using (stmt executeQuery pagedSQL) { rs: ResultSet =>
+      
+      log.debug("ResultSet: '%s'", rs)
       val flatValuesMaps = process(rs, collectionMapping)
+      log.debug("FlatValues: '%s'", flatValuesMaps)
+
       val insert = flatValuesMaps map { fieldmap =>
         val map = clusterByPrefix(fieldmap).toMap
         val b = MongoDBObject.newBuilder
         b ++= map
         b.result
       }
+            
       doInsert(insert, collectionMapping.name)
       flatValuesMaps.size
     }
@@ -135,10 +149,13 @@ abstract class SQLImporter(val mapping: Iterable[CollectionMapping]) extends Ins
       selectables.foreach { case (fieldName, selectable) =>
         val indexEnd = index+selectable.colCount
         val rsValues = for {i <- index until indexEnd} yield rs getObject i
-        val value = selectable toValue rsValues
+        var value:Any = selectable toValue rsValues
         if (value!=null) {
-          map.put(fieldName, value)
+          log.trace("Returned Value: '%s' as '%s'", value.toString, value.getClass)
+          if(value.isInstanceOf[java.math.BigDecimal]) // Downcast since BigDecimal pisses off MongoDB's intenal BSON lib
+            value = value.asInstanceOf[java.math.BigDecimal].doubleValue
         }
+        map.put(fieldName, value)  // Moved outside if: Allowing document fields to be null
         index = indexEnd
       }
 

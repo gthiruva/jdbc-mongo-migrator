@@ -9,7 +9,7 @@ import _root_.jm.migrator._
 object DBUtil {
   private val sett = Launcher.settings;
   private val log = Logger.get(getClass)
-  log.setLevel(Level.ALL)
+  log.setLevel(Level.DEBUG)
   log.addHandler(new ConsoleHandler(new Formatter(), None))
 
   Class.forName(sett.jdbcDriver).newInstance;

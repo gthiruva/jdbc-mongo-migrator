@@ -97,7 +97,7 @@ def get_logConsole = logConsole
 
 object Launcher {
   val log = Logger.get(getClass)
-  log.setLevel(Level.ALL)
+  log.setLevel(Level.DEBUG)
   log.addHandler(new ConsoleHandler(new Formatter(), None))
   val parser = new MappingParser()
   val configFile = new java.io.File("MongoImportConfig.scala")
@@ -112,7 +112,7 @@ object Launcher {
 
     val collections = parser.parseFile(settings.mappingFileName)
     log.debug("Collections: "+collections)
-    log.debug(collections toString)
+    log.trace(collections toString)
     val importer = new SQLImporter(collections) with MongoInsertBackend
     importer.fetch   // .foreach (seq => log.debug(seq.toString))
     MongoUtil.close

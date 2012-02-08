@@ -1,23 +1,15 @@
 package jm.migrator.parser
 
-import net.liftweb.json.JsonParser._
+import jm.migrator.domain._
 import io.Source
 import java.io.{FileInputStream, File, InputStream}
-// import net.liftweb.json._
+import net.liftweb.json.JsonParser._
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import net.liftweb.json.DefaultFormats
-
-import jm.migrator.domain._
-
+//import net.liftweb.json._
+import net.liftweb.json.JsonDSL._
 import com.twitter.logging._
-//import com.twitter.logging.Logger
-//import com.twitter.logging.config._
-
-/**
- * Authod: Yuri Buyanov
- * Date: 2/3/11 4:53 PM
- */
 
 class MappingParser {
   val log = Logger.get(getClass)
@@ -25,31 +17,36 @@ class MappingParser {
   log.addHandler(new ConsoleHandler(new Formatter(), None))
 
   def parseFile(filename: String): Iterable[CollectionMapping] = {
-    println("Parsing filename: "+filename)
+    log.debug("Parsing filename: "+filename)
     val input = Source.fromFile(filename).mkString
+    log.debug("Parsing input: " + input)
     val json = parse(input)
-    val children = json \ "collections" children
+    log.debug("JSON Parsing Output: " + json)
+    val children = json \\ "collections" children
 
-    for {
-      JObject(list) <- children
-      JField(name, data) <- list
-    } yield parseCollection(name, data)
+    for (child <- children) yield parseCollection(child)
   }
-
-  def parseCollection(name: String, json: JValue): CollectionMapping = {
-    val from = (json \ "from" \ classOf[JString])(0)
+    
+  def parseCollection(child: JValue): CollectionMapping = {
+    val (coll, valu) = child.values
+    val name = coll.toString()
+    val json = child.children(0)
+    log.debug("Parsing JSON collection: " + name)
+    log.debug("Searching for 'from' as: " + (json \ "from").values)
+    
+    val from = (json \ "from").values.toString
     val jfields = Map(json \ "mapping" \ classOf[JField]: _*)
     val where = (json \ "where" \ classOf[JString]).headOption.getOrElse("")
-    val fields = jfields mapValues getMapping(name)
+    val fields = jfields mapValues getMapping(name)_
     CollectionMapping(name, from, Fields(fields), where)
-  }
+    }
 
   def getMapping(collection: String)(obj: Any): MappedValue = {
     obj match {
       case column: String =>
         SimpleValue(column)
-      case m: Map[String, Any] if m.contains("$surl") =>
-        m.get("$surl") match {
+      case mapval: Map[String, Any] if mapval.contains("$surl") =>
+        mapval.get("$surl") match {
           case Some(expr: String) => ShortUrl(expr)
           case unknown  => throw new Exception("Incorrect $oid mapping: "+unknown)
         }
@@ -114,7 +111,6 @@ class MappingParser {
     CountMap(from, where, key)
   }
 
-
   def parseSubselect(subselect: Map[String, Any], collection: String): Array = {
     val from = subselect.getOrElse("from", throw new Exception("No 'from' specified: " + subselect)).toString
     val mapping = subselect get("mapping") map getMapping(collection) match {
@@ -125,8 +121,4 @@ class MappingParser {
     val where = subselect.get("where").getOrElse("").toString
     Array(from, mapping, where)
   }
-
-
-
-
 }
