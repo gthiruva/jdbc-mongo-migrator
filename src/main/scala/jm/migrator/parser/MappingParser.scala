@@ -42,8 +42,10 @@ class MappingParser {
     }
 
   def getMapping(collection: String)(obj: Any): MappedValue = {
+    log.debug("getMapping is probing: '%s' => '%s' as '%s'", collection, obj, obj.getClass)
     obj match {
       case column: String =>
+        log.debug("  case column is: '%s'", column)
         SimpleValue(column)
       case mapval: Map[String, Any] if mapval.contains("$surl") =>
         mapval.get("$surl") match {
@@ -61,6 +63,7 @@ class MappingParser {
           case unknown  => throw new Exception("Incorrect $long mapping: "+unknown)
         }
       case m: Map[String, Any] if m.contains("$oid") =>
+        log.debug("  case of Map is: '%s', '%s', '%s', '%s'", m, m.get("$oid"), m.keys, m.values)
         m.get("$oid") match {
           case Some(key: String) => MongoId(key, collection)
           case Some(oidData: Map[String, String]) => MongoId(oidData.get("key").get, oidData.get("collection").get)

@@ -9,7 +9,7 @@ import jm.migrator.db.DBUtil._
 import jm.migrator.db.InsertBackend
 
 import com.mongodb.casbah.Implicits._
-import com.mongodb.casbah.Imports._
+import com.mongodb.casbah._ //Imports._
 
 //import com.mongodb.DBObject
 //import com.mongodb.casbah.Imports._

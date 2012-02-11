@@ -8,3 +8,4 @@ project/target
 .lib
 .project
 .settings
+.DS_Store

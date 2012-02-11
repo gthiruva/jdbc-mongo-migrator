@@ -1,15 +1,11 @@
 package jm.migrator.parser;
 
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import org.scalatest.matchers.MustMatchers
 
 import jm.migrator.domain._
 
-/*
- * Author: Yuri Buyanov
- * Date: 3/17/11 12:38 PM
- */
-class MappingParserTest extends Spec with MustMatchers {
+class MappingParserTest extends FunSpec with MustMatchers {
 
   val parser = new MappingParser
   val url = getClass.getResource("/test_mapping.json").getFile
