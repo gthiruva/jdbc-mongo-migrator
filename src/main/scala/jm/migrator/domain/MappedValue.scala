@@ -1,14 +1,8 @@
 package jm.migrator.domain
 
 import jm.migrator.db.MongoUtil
-
 import jm.migrator.util.Implicits._
 import jm.migrator.util.ShortUrlEncoder
-
-/**
- * Authod: Yuri Buyanov
- * Date: 2/3/11 2:10 PM
- */
 
 abstract sealed class MappedValue
 

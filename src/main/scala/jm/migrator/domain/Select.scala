@@ -1,6 +1,7 @@
 package jm.migrator.domain
 
 import jm.migrator.util.Implicits._
+import scala.collection.mutable.StringBuilder
 
 trait Select {
   def mapping: Selectable
@@ -8,7 +9,8 @@ trait Select {
   def where: String = ""
 
   def toSQL(expressionParams: Map[String, Any] = Map.empty) = {
-    val builder = new StringBuilder("SELECT ")
+    val builder = new StringBuilder
+    builder ++="SELECT "
     builder ++= mapping.columnsString
     builder ++= " FROM " ++ from
     if (where.length > 0) {
